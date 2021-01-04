@@ -52,7 +52,7 @@ md"""
 # ╔═╡ 5d41cf54-4e3e-11eb-2eea-ab2e13cc25bd
 html"""
 <p align="center">
-<img src="https://github.com/lbreston/MFCN-2021/blob/main/MarrLevels.png?raw=true">
+<img src="https://github.com/lbreston/MFCN-2021/blob/main/Lecture%201/MarrLevels.png?raw=true">
 </p>
 """
 
@@ -125,7 +125,7 @@ Dopaminergic activity in the sNC has been shown to indicate reward prediction er
 # ╔═╡ 95b7acda-4e60-11eb-09f7-d168de63b57b
 html"""
 <p align="center">
-<img src="https://github.com/lbreston/MFCN-2021/blob/main/TDdopamine.png?raw=true">
+<img src="https://github.com/lbreston/MFCN-2021/blob/main/Lecture%201/TDdopamine.png?raw=true">
 </p>
 """
 
