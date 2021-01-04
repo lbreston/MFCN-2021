@@ -52,7 +52,7 @@ md"""
 # ╔═╡ 5d41cf54-4e3e-11eb-2eea-ab2e13cc25bd
 html"""
 <p align="center">
-<img src="https://github.com/lbreston/MFCN-2021/blob/main/Lecture%201/MarrLevels.png?raw=true">
+<img src="https://github.com/lbreston/MFCN-2021/blob/main/Lecture%201/MarrLevels.png?raw=true", width="500">
 </p>
 """
 
@@ -117,7 +117,7 @@ md"""
 
 How might TD learning be **implemented** in the brain?
 
-Dopaminergic activity in the sNC has been shown to indicate reward prediction error which could provide a substrate for neural TD learning. 
+Dopaminergic activity in the SNc and VTA has been shown to indicate reward prediction error which could provide a substrate for neural TD learning. 
 
 """
 
@@ -413,9 +413,9 @@ end
 # ╟─95b7acda-4e60-11eb-09f7-d168de63b57b
 # ╟─1e02451c-4e61-11eb-1fd0-e705e87fa33e
 # ╟─91d6acd2-4e64-11eb-0b39-3f6955a15873
-# ╠═1f206464-4df9-11eb-3d26-09e3d59d1040
+# ╟─1f206464-4df9-11eb-3d26-09e3d59d1040
 # ╟─5b8a7b0c-4df8-11eb-1492-7d3f7c4d8720
-# ╠═14583e2c-4df8-11eb-0666-cf93a37dbe1b
+# ╟─14583e2c-4df8-11eb-0666-cf93a37dbe1b
 # ╟─732135ce-4e22-11eb-313e-7d706453b230
 # ╟─abe5ac8c-4df8-11eb-2b4c-77000fb32096
 # ╟─c81b67e4-4df9-11eb-3d33-a513b5e44b49
