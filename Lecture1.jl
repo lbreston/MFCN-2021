@@ -30,24 +30,89 @@ begin
 	using LinearAlgebra
 end
 
+# ╔═╡ 5e4a2940-4e49-11eb-344d-ed607b1378b3
+md"""
+# Algorithms in Neuroscience 
+
+The goal of this lecture is to learn how to use computational principals to understand natural phenomena.
+
+Biological systems, of all scales, have evolved to solve the challenges posed by their environments inorder to give themselves the best chance of survival and reproduction. **Algorithms** are processes or sets of rules used to solve classes of problems, which makes them a powerful tool to systemitize and describe these natural strategies. 
+
+"""
+
 # ╔═╡ 15a3dbe6-4e35-11eb-1ec7-8fec8f864b9d
 md"""
-# Computational Thinking & Reinforcement Learning
 
-### Marr's Levels of Analysis
+## Marr's Levels of Analysis
+
 1. Computational: what does the system do, and why does it do these things 
 2. Algorithmic/representational level: how does the system do what it does
 3. Implementational/physical level: how is the system physically realized
 
 """
 
-
 # ╔═╡ 5d41cf54-4e3e-11eb-2eea-ab2e13cc25bd
 html"""
+<p align="center">
+<img src="https://github.com/lbreston/MFCN-2021/blob/main/MarrLevels.png?raw=true">
+</p>
+"""
 
-<iframe width="100%" height="450px" src="" frameborder="0"></iframe>
+
+# ╔═╡ 27b8a530-4e41-11eb-1cfb-d97730a51570
+md"""
+
+## Reinforcement Learning 
+
+**Reinforcement Learning (RL)** is the process by which an **agent** learns to act in its environment such that it maximizes its cummulative reward. 
+
+Understanding RL is a fundamental challenge for neuroscience because it underpins how the brain learns to behave!
+
+**Challenges Facing RL**
+1. Curse of Dimensionality _i.e._ the world is way too complex brute force for trial and error
+2. **Temporal Credit Assignment** 
+3. Imperfect Information 
+4. **Exploration-Exploitation Dilemma**
+5. ...
 
 """
+
+# ╔═╡ 2c4139f8-4e50-11eb-0ec6-1bfbffaee0d4
+md"""
+
+#### Temporal Credit Assignment 
+Using Marr's framework what **Computational** problem must RL solve? 
+
+An agent must bind rewards to temporally distal prior states and actions. 
+
+We must introduce some symbols to describe this problem algebraically
+
+Let $S_{t}$ be the state of the agent and environment at time $t$. Let $\pi$ be a policy, or a set of state-action pairs, $r_{t}$ be the reward at $S_{t}$, and $\lambda$ be the discount rate. $V^{\pi}\left(S_{t}\right)$ is the value of the state $S_{t}$ under the policy $\pi$.
+
+$V^{\pi}\left(S_{t}\right)=\sum_{t'=0}^{\infty} \lambda^{t'}r_{t+t'}$
+
+That is the value of the current state is the discounted sum of all the expected future rewards. 
+
+To derive an **Algorithm** to learn $V^{\pi}\left(S_{t}\right)$ we start by splitting the sum.
+
+$V^{\pi}\left(S_{t}\right)=r_{t}+\sum_{t'=0}^{\infty} \lambda^{(t+1)+t'}r_{(t+1)+t'}$
+
+We can now recursively define the function as 
+
+$V^{\pi}\left(S_{t}\right)=r_{t}+V^{\pi}\left(S_{t+1}\right)$
+
+This recursive formulation gives us the simple learning rule 
+
+$V^{\pi}\left(S_{t}\right)=V^{\pi}\left(S_{t}\right)+\alpha\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)\text{-}V^{\pi}\left(S_{t}\right)\right]$
+
+where $\alpha$ is the learning rate and $\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)-V^{\pi}\left(S_{t}\right)\right]$ is the prediction error.
+
+This **Temporal-Difference (TD) Learning**!
+
+
+"""
+
+# ╔═╡ 6bea0ad8-4e5e-11eb-230a-51f2820c6ec7
 
 
 # ╔═╡ 1f206464-4df9-11eb-3d26-09e3d59d1040
@@ -278,10 +343,17 @@ if run_sim
 	run!(T,Iter)
 end
 
+# ╔═╡ 8ce1c23c-4e50-11eb-29d9-3f4c7ef30747
+
+
 # ╔═╡ Cell order:
-# ╠═008f3956-4a5e-11eb-24ea-03e93ce450e1
+# ╟─008f3956-4a5e-11eb-24ea-03e93ce450e1
+# ╟─5e4a2940-4e49-11eb-344d-ed607b1378b3
 # ╟─15a3dbe6-4e35-11eb-1ec7-8fec8f864b9d
-# ╠═5d41cf54-4e3e-11eb-2eea-ab2e13cc25bd
+# ╟─5d41cf54-4e3e-11eb-2eea-ab2e13cc25bd
+# ╟─27b8a530-4e41-11eb-1cfb-d97730a51570
+# ╟─2c4139f8-4e50-11eb-0ec6-1bfbffaee0d4
+# ╠═6bea0ad8-4e5e-11eb-230a-51f2820c6ec7
 # ╟─1f206464-4df9-11eb-3d26-09e3d59d1040
 # ╟─5b8a7b0c-4df8-11eb-1492-7d3f7c4d8720
 # ╟─14583e2c-4df8-11eb-0666-cf93a37dbe1b
@@ -296,3 +368,4 @@ end
 # ╟─4cea4ede-4e01-11eb-2627-594f161dc6c9
 # ╟─c86dec2a-4dd2-11eb-1268-cfd2b1371997
 # ╟─1a262604-4d8d-11eb-3152-4be667b62808
+# ╠═8ce1c23c-4e50-11eb-29d9-3f4c7ef30747
