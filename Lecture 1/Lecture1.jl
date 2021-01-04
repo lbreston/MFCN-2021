@@ -151,7 +151,7 @@ Below is an implementation of TD learning to find the shortest path between two 
 
 
 # ╔═╡ 1f206464-4df9-11eb-3d26-09e3d59d1040
-md"Graph Size: $(@bind sz Slider(1:20; show_value=true)) Sparsity: $(@bind sparsity Slider(0:.01:1; show_value=true))"
+md"Graph Size: $(@bind sz Slider(1:20; show_value=true, default=12)) Sparsity: $(@bind sparsity Slider(0:.01:1; show_value=true, default=.2))"
 
 # ╔═╡ 14583e2c-4df8-11eb-0666-cf93a37dbe1b
 md"Start: $(@bind Start NumberField(1:sz)) End: $(@bind Terminal NumberField(1:sz;default=Int(floor(sz/2))))"
@@ -413,9 +413,9 @@ end
 # ╟─95b7acda-4e60-11eb-09f7-d168de63b57b
 # ╟─1e02451c-4e61-11eb-1fd0-e705e87fa33e
 # ╟─91d6acd2-4e64-11eb-0b39-3f6955a15873
-# ╟─1f206464-4df9-11eb-3d26-09e3d59d1040
+# ╠═1f206464-4df9-11eb-3d26-09e3d59d1040
 # ╟─5b8a7b0c-4df8-11eb-1492-7d3f7c4d8720
-# ╟─14583e2c-4df8-11eb-0666-cf93a37dbe1b
+# ╠═14583e2c-4df8-11eb-0666-cf93a37dbe1b
 # ╟─732135ce-4e22-11eb-313e-7d706453b230
 # ╟─abe5ac8c-4df8-11eb-2b4c-77000fb32096
 # ╟─c81b67e4-4df9-11eb-3d33-a513b5e44b49
