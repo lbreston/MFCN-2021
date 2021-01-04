@@ -19,13 +19,11 @@ begin
 	Pkg.add([ 
 			"GraphRecipes"
 			"PlutoUI"
-			"Images"
 			"Plots"
 			"LinearAlgebra"
 			])
 	using PlutoUI
 	using GraphRecipes
-	using Images
 	using Plots
 	using LinearAlgebra
 end
@@ -105,7 +103,7 @@ This recursive formulation gives us the simple learning rule
 
 $V^{\pi}\left(S_{t}\right)=V^{\pi}\left(S_{t}\right)+\alpha\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)\text{-}V^{\pi}\left(S_{t}\right)\right]$
 
-where $\alpha$ is the learning rate and $\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)-V^{\pi}\left(S_{t}\right)\right]$ is the prediction error.
+where $\alpha$ is the learning rate and $\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)\text{-}V^{\pi}\left(S_{t}\right)\right]$ is the reward prediction error.
 
 This **Temporal-Difference (TD) Learning**!
 
@@ -113,19 +111,61 @@ This **Temporal-Difference (TD) Learning**!
 """
 
 # ╔═╡ 6bea0ad8-4e5e-11eb-230a-51f2820c6ec7
+md"""
+
+#### TD Learning in the Brain 
+
+How might TD learning be **implemented** in the brain?
+
+Dopaminergic activity in the sNC has been shown to indicate reward prediction error which could provide a substrate for neural TD learning. 
+
+"""
+
+
+# ╔═╡ 95b7acda-4e60-11eb-09f7-d168de63b57b
+html"""
+<p align="center">
+<img src="https://github.com/lbreston/MFCN-2021/blob/main/TDdopamine.png?raw=true">
+</p>
+"""
+
+# ╔═╡ 1e02451c-4e61-11eb-1fd0-e705e87fa33e
+md"""
+
+#### Exploration-Exploitation Dilemma
+
+To find the most optimal policy, agents must thoroughly search the space of possible states. However, practical contstraints require the agent to balance this exploration against prioritize known, high value states. 
+
+A common solution is to randomly sample states in porportion to their known value. One of the simplest sampling algorithms is called **$\bf{\varepsilon}$-greedy**. This algorithm samples the highest value state with probability $1-\varepsilon$ and samples a random state with probability $\varepsilon$.
+
+"""
+
+# ╔═╡ 91d6acd2-4e64-11eb-0b39-3f6955a15873
+md"""
+
+## TD Learning Example
+
+Below is an implementation of TD learning to find the shortest path between two nodes on a graph. The Agent begins at the Start node, marked in red, and travels along the edges, from node to node, until it reaches the Terminal node, marked in blue, and recieves a reward. After each move the Agent updates its estimates for the value of each node which corresponds to how many moves it is away from the reward. 
+
+"""
 
 
 # ╔═╡ 1f206464-4df9-11eb-3d26-09e3d59d1040
 md"Graph Size: $(@bind sz Slider(1:20; show_value=true)) Sparsity: $(@bind sparsity Slider(0:.01:1; show_value=true))"
 
 # ╔═╡ 14583e2c-4df8-11eb-0666-cf93a37dbe1b
-md"Start: $(@bind Start NumberField(1:sz)) End: $(@bind Terminal NumberField(1:sz))"
+md"Start: $(@bind Start NumberField(1:sz)) End: $(@bind Terminal NumberField(1:sz;default=Int(floor(sz/2))))"
 
 # ╔═╡ abe5ac8c-4df8-11eb-2b4c-77000fb32096
-md"lamda: $(@bind l Slider(0:.01:1; show_value=true)) alpha: $(@bind a Slider(0:.01:1; show_value=true)) epsilon: $(@bind e Slider(0:.01:1; show_value=true))"
+md"lamda: $(@bind l Slider(0:.01:1; default=0.8, show_value=true)) alpha: $(@bind a Slider(0:.01:1; show_value=true, default=.2)) epsilon: $(@bind e Slider(0:.01:1; show_value=true, default=.2))"
 
 # ╔═╡ 7257b2b2-4e09-11eb-2748-abdc8ef6e67a
-md"Run Sim: $(@bind run_sim CheckBox()) Iterations: $(@bind Iter NumberField(1:1000))"
+md"Run Sim: $(@bind run_sim CheckBox()) Iterations: $(@bind Iter NumberField(1:1000; default=100))"
+
+# ╔═╡ 4778e366-4e6a-11eb-0c9a-8b3e8c5ec8e9
+md"""
+Defines **Graph Maze**
+"""
 
 # ╔═╡ 740f2128-4d8a-11eb-1f96-d92e5e1808cf
 begin
@@ -162,22 +202,22 @@ begin
 		sz=size(G.AdjMat,1);
 		
 		nodecolors=fill(color("white"),sz);
-		nodecolors[G.Terminal]=color("gold");
+		nodecolors[G.Terminal]=color("blue");
 		
-		lp=length(G.Path);
-		
-		
-		path_colors=cgrad(:Reds_3,2,categorical = true);
-		for i=1:min(2,lp) nodecolors[G.Path[end-i+1]]=path_colors[end-i+1];end;
-		
+		nodecolors[G.Start]=cgrad(:Reds_3,2,categorical = true)[2]
+
 graphplot(G.AdjMat,method=:circular,nodeshape=:circle,nodecolor=nodecolors,names=1:sz,nodesize=.25)
 	end
 	
 end 
 
+# ╔═╡ 24600f80-4e6a-11eb-0166-4799f5b6ce6d
+md"""
+Defines **Agent** 
+"""
+
 # ╔═╡ 2966329c-4dad-11eb-1342-21c9ddd3d072
 begin 
-	
 	mutable struct Agent
 		λ
 		α
@@ -189,33 +229,52 @@ begin
 		Agent(λ,α,ϵ,fill(0.0,s))
 	end
 	
-	function choose_next_move(A::Agent,G::GraphMaze)
-		
-		aval_moves=avalible_moves(G);
-		vals=A.V[aval_moves];
-		max_moves=aval_moves[findall(x->x==max(vals...),vals)]
-		
-		if rand(Float64)<A.ϵ
-			return rand(aval_moves)
-		else
-			return rand(max_moves)
-		end
-		
+	function reset!(A::Agent)
+		A.V=fill(0.0,length(A.V))
 	end
 	
-	function update!(A::Agent,G::GraphMaze)
-		current_state=G.Path[end];
-		prior_state=G.Path[end-1];
+end
+
+# ╔═╡ d82dfc44-4e69-11eb-3960-ab41b32db40d
+md"""
+Implements **$\bf{\varepsilon}$-greedy** algorithm
+"""
+
+# ╔═╡ 17f20dee-4e69-11eb-25b2-b72383a37c87
+function choose_next_move(A::Agent,G::GraphMaze)
 		
-		if isover(G)
-			A.V[current_state]=1.0;
-		end
+	aval_moves=avalible_moves(G);
+	vals=A.V[aval_moves];
+	max_moves=aval_moves[findall(x->x==max(vals...),vals)]
 		
-		A.V[prior_state]=A.V[prior_state]+A.α*(A.λ*A.V[current_state]-A.V[prior_state]);
-		
+	if rand(Float64)<A.ϵ
+		return rand(aval_moves)
+	else
+		return rand(max_moves)
 	end
-	
-	function step!(A::Agent,G::GraphMaze)
+		
+end
+
+# ╔═╡ fef53478-4e69-11eb-39cb-430341613636
+md"""
+Implements **TD Learning**
+"""
+
+# ╔═╡ 3d5e899a-4e69-11eb-03ea-7be5e5cdbd26
+function update!(A::Agent,G::GraphMaze)
+	current_state=G.Path[end];
+	prior_state=G.Path[end-1];
+		
+	if isover(G)
+		A.V[current_state]=1.0;
+	end
+		
+	A.V[prior_state]=A.V[prior_state]+A.α*(A.λ*A.V[current_state]-A.V[prior_state]);
+		
+end
+
+# ╔═╡ 5d11481a-4e6c-11eb-3d0d-55b99ec2f895
+function step!(A::Agent,G::GraphMaze)
 		
 		if isover(G)
 			reset!(G)
@@ -225,21 +284,15 @@ begin
 		move!(G,mv);
 		update!(A,G);
 
-	end
-	
-	
 end
-
-
-		
+	
 
 # ╔═╡ 5166a7b8-4dc9-11eb-2a3a-67dc6c8bdcc4
 function plot(A::Agent,G::GraphMaze)	
 	sz=length(A.V);
 		
-		#nodecolors=fill(color("white"),Int(sz));
-		#nodecolors[G.Terminal]=color("gold");
-	    nodecolors=[cgrad([:white, :gold])[i] for i=A.V]
+		
+	    nodecolors=[cgrad([:white, :blue])[i] for i=A.V]
 		
 		lp=length(G.Path);
 	
@@ -256,7 +309,6 @@ function plot(A::Agent,G::GraphMaze)
 	if lp≥2
 		for i=1:lp-1
 			path_mat[G.Path[i],G.Path[i+1]]=1;
-			#path_mat[G.Path[i+1],G.Path[i]]=1;
 		end
 	end
 	
@@ -304,7 +356,7 @@ begin
 	function Tracker(G::GraphMaze,A::Agent)
 		Tracker(G,A,1,transpose(A.V))
 	end
-	
+
 	function run!(T::Tracker)
 		step!(T.Agent,T.GraphMaze)
 		T.Steps=T.Steps+1
@@ -330,21 +382,25 @@ begin
 		
 		gif(anim, "GMTracker.gif", fps=8)	
 		
-
 	end
 
 		
 	
 end
 
-# ╔═╡ d380e4ea-4e05-11eb-2e16-d791f1d97a1a
-if run_sim
+# ╔═╡ 5167ac6a-4e6d-11eb-0d17-a59befdd80f3
+begin
 	T=Tracker(G,A)
-	run!(T,Iter)
+	run!(T)
 end
 
-# ╔═╡ 8ce1c23c-4e50-11eb-29d9-3f4c7ef30747
-
+# ╔═╡ d380e4ea-4e05-11eb-2e16-d791f1d97a1a
+if run_sim
+	reset!(G)
+	reset!(A)
+	T2=Tracker(G,A)
+	run!(T2,Iter)
+end
 
 # ╔═╡ Cell order:
 # ╟─008f3956-4a5e-11eb-24ea-03e93ce450e1
@@ -353,19 +409,29 @@ end
 # ╟─5d41cf54-4e3e-11eb-2eea-ab2e13cc25bd
 # ╟─27b8a530-4e41-11eb-1cfb-d97730a51570
 # ╟─2c4139f8-4e50-11eb-0ec6-1bfbffaee0d4
-# ╠═6bea0ad8-4e5e-11eb-230a-51f2820c6ec7
+# ╟─6bea0ad8-4e5e-11eb-230a-51f2820c6ec7
+# ╟─95b7acda-4e60-11eb-09f7-d168de63b57b
+# ╟─1e02451c-4e61-11eb-1fd0-e705e87fa33e
+# ╟─91d6acd2-4e64-11eb-0b39-3f6955a15873
 # ╟─1f206464-4df9-11eb-3d26-09e3d59d1040
 # ╟─5b8a7b0c-4df8-11eb-1492-7d3f7c4d8720
 # ╟─14583e2c-4df8-11eb-0666-cf93a37dbe1b
 # ╟─732135ce-4e22-11eb-313e-7d706453b230
 # ╟─abe5ac8c-4df8-11eb-2b4c-77000fb32096
 # ╟─c81b67e4-4df9-11eb-3d33-a513b5e44b49
+# ╠═5167ac6a-4e6d-11eb-0d17-a59befdd80f3
 # ╟─7257b2b2-4e09-11eb-2748-abdc8ef6e67a
 # ╟─d380e4ea-4e05-11eb-2e16-d791f1d97a1a
+# ╟─4778e366-4e6a-11eb-0c9a-8b3e8c5ec8e9
 # ╟─740f2128-4d8a-11eb-1f96-d92e5e1808cf
+# ╟─24600f80-4e6a-11eb-0166-4799f5b6ce6d
 # ╟─2966329c-4dad-11eb-1342-21c9ddd3d072
+# ╟─d82dfc44-4e69-11eb-3960-ab41b32db40d
+# ╠═17f20dee-4e69-11eb-25b2-b72383a37c87
+# ╟─fef53478-4e69-11eb-39cb-430341613636
+# ╠═3d5e899a-4e69-11eb-03ea-7be5e5cdbd26
+# ╟─5d11481a-4e6c-11eb-3d0d-55b99ec2f895
 # ╟─5166a7b8-4dc9-11eb-2a3a-67dc6c8bdcc4
 # ╟─4cea4ede-4e01-11eb-2627-594f161dc6c9
 # ╟─c86dec2a-4dd2-11eb-1268-cfd2b1371997
 # ╟─1a262604-4d8d-11eb-3152-4be667b62808
-# ╠═8ce1c23c-4e50-11eb-29d9-3f4c7ef30747
