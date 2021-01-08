@@ -136,7 +136,7 @@ md"""
 
 To find the most optimal policy, agents must thoroughly search the space of possible states. However, practical contstraints require the agent to balance this exploration against prioritize known, high value states. 
 
-A common solution is to randomly sample states in porportion to their known value. One of the simplest sampling algorithms is called **$\bf{\varepsilon}$-greedy**. This algorithm samples the highest value state with probability $1-\varepsilon$ and samples a random state with probability $\varepsilon$.
+A common solution is to randomly sample states in porportion to their known value. One of the simplest sampling algorithms is called **$\bf{\varepsilon}$-greedy**. This algorithm samples the highest value state with probability $1\text{-}\varepsilon$ and samples a random state with probability $\varepsilon$.
 
 """
 
@@ -175,10 +175,11 @@ begin
 		Terminal
 		Start
 		Path
+		PathCounts
 	end
 	
 	function GraphMaze(AdjMat,Terminal,Start)
-		GraphMaze(AdjMat,Terminal,Start,Start)	
+		GraphMaze(AdjMat,Terminal,Start,Start,fill(0.0,size(AdjMat)))	
 	end
 	
 	function avalible_moves(G::GraphMaze)
@@ -188,6 +189,8 @@ begin
 	
 	function move!(G::GraphMaze,nextstate)
 		G.Path=vcat(G.Path,nextstate);
+		G.PathCounts[G.Path[end-1],nextstate]+=1
+		G.PathCounts[nextstate,G.Path[end-1]]+=1
 	end
 	
 	function isover(G::GraphMaze)
@@ -312,7 +315,7 @@ function plot(A::Agent,G::GraphMaze)
 		end
 	end
 	
-graphplot(path_mat,method=:circular,nodeshape=:circle,nodecolor=nodecolors,names=1:sz,nodesize=.3,self_edge_size=0.0)
+graphplot(G.AdjMat,method=:circular,nodeshape=:circle,nodecolor=nodecolors,names=1:sz,nodesize=.3,self_edge_size=0.0,edge_width=G.PathCounts./sum(G.PathCounts).*5)
 end
 
 # ╔═╡ 1a262604-4d8d-11eb-3152-4be667b62808
@@ -427,9 +430,9 @@ end
 # ╟─24600f80-4e6a-11eb-0166-4799f5b6ce6d
 # ╟─2966329c-4dad-11eb-1342-21c9ddd3d072
 # ╟─d82dfc44-4e69-11eb-3960-ab41b32db40d
-# ╠═17f20dee-4e69-11eb-25b2-b72383a37c87
+# ╟─17f20dee-4e69-11eb-25b2-b72383a37c87
 # ╟─fef53478-4e69-11eb-39cb-430341613636
-# ╠═3d5e899a-4e69-11eb-03ea-7be5e5cdbd26
+# ╟─3d5e899a-4e69-11eb-03ea-7be5e5cdbd26
 # ╟─5d11481a-4e6c-11eb-3d0d-55b99ec2f895
 # ╟─5166a7b8-4dc9-11eb-2a3a-67dc6c8bdcc4
 # ╟─4cea4ede-4e01-11eb-2627-594f161dc6c9
