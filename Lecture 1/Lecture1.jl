@@ -101,9 +101,9 @@ $V^{\pi}\left(S_{t}\right)=r_{t}+V^{\pi}\left(S_{t+1}\right)$
 
 This recursive formulation gives us the simple learning rule 
 
-$V^{\pi}\left(S_{t}\right)=V^{\pi}\left(S_{t}\right)+\alpha\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)\text{-}V^{\pi}\left(S_{t}\right)\right]$
+$V^{\pi}\left(S_{t}\right)=V^{\pi}\left(S_{t}\right)+\alpha\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)-V^{\pi}\left(S_{t}\right)\right]$
 
-where $\alpha$ is the learning rate and $\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)\text{-}V^{\pi}\left(S_{t}\right)\right]$ is the reward prediction error.
+where $\alpha$ is the learning rate and $\left[r_{t}+\lambda V^{\pi}\left(S_{t+1}\right)-V^{\pi}\left(S_{t}\right)\right]$ is the reward prediction error.
 
 This **Temporal-Difference (TD) Learning**!
 
@@ -315,7 +315,7 @@ function plot(A::Agent,G::GraphMaze)
 		end
 	end
 	
-graphplot(G.AdjMat,method=:circular,nodeshape=:circle,nodecolor=nodecolors,names=1:sz,nodesize=.3,self_edge_size=0.0,edge_width=G.PathCounts./sum(G.PathCounts).*5)
+graphplot(G.AdjMat,method=:circular,nodeshape=:circle,nodecolor=nodecolors,names=1:sz,nodesize=.3,self_edge_size=0.0,edge_width=G.PathCounts./sum(G.PathCounts).*10)
 end
 
 # ╔═╡ 1a262604-4d8d-11eb-3152-4be667b62808
@@ -422,7 +422,7 @@ end
 # ╟─732135ce-4e22-11eb-313e-7d706453b230
 # ╟─abe5ac8c-4df8-11eb-2b4c-77000fb32096
 # ╟─c81b67e4-4df9-11eb-3d33-a513b5e44b49
-# ╠═5167ac6a-4e6d-11eb-0d17-a59befdd80f3
+# ╟─5167ac6a-4e6d-11eb-0d17-a59befdd80f3
 # ╟─7257b2b2-4e09-11eb-2748-abdc8ef6e67a
 # ╟─d380e4ea-4e05-11eb-2e16-d791f1d97a1a
 # ╟─4778e366-4e6a-11eb-0c9a-8b3e8c5ec8e9
